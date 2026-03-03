@@ -5,7 +5,7 @@
 DHT dht(DHT_PIN, DHT_TYPE, 6);
 
 void initDHT() {
-    dht.begin(); // Nu körs Adafruits interna startsekvens
+    dht.begin(); // startsekvensen
     Serial.println("DHT Initierad");
 }
 
@@ -14,7 +14,7 @@ bool getDHTData() {
     float t = dht.readTemperature();
 
     if (isnan(h) || isnan(t)) {
-        return false; // Fortsätt vänta i din state machine
+        return false; 
     }
 
     currentStatus.indoorTemp = t;
