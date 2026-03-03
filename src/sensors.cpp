@@ -1,53 +1,49 @@
-// -- hanterar den "icke-blockerande" logiken -- 
+// --- definierar HUR (sekvensen) och VAD som ska köras --- 
+#include "sensors.h"
+#include "sensor_dht11.h"
+#include <stdio.h>
+#include <Arduino.h>
+#define numOfPrio3Sensors 2
 
-void readPrio2SensorsAsync(){
-    static int currentSensor = 0; // static -> sätts endast EN gång (init)
-    
-    // för att minimiera jitter för "låg-prio" sensorer - läs asynkront, en sensor åt gången.
-    switch (currentSensor)
-    {
-    case 0: 
-        //läs fire-smoke
-        break;
-    case 1:
-        //läs fire-temp
-        break;
-    }
+enum SensorState {
+    READING_DHT,
+    READING_WATER
+};
 
-    currentSensor++;
-    if (currentSensor >= 2){
-        currentSensor = 0;
-    }
-
+SensorData currentStatus = {
+    .reedSensor1 = false,
+    .reedSensor2 = false,
+    .motionDetect = false,
+    .smokeSensor = false,
+    .fireTemp = 0.0,
+    .indoorTemp = 0.0,
+    .indoorHumidity = 0.0,
+    .waterLeak = false
 };
 
 void readPrio3SensorsAsync(){
-    static int currentSensor = 0; // static -> sätts endast EN gång (init)
-    static bool DHT11_isBusy = false; // if true -> behåller samma case
-
+    static int currentSensor = READING_DHT; // static -> sätts endast EN gång (init)
     // för att minimiera jitter för "låg-prio" sensorer - läs asynkront, en sensor åt gången.
     switch (currentSensor)
     {
-    case 0: 
-        if (!DHT11_isBusy){
-        // requestDHT11Data();
-            DHT11_isBusy = true;
+    case READING_DHT: 
+        if (getDHTData())  //retunerar 'True' när sensorn är redo och datan är lagrad.
+            currentSensor = READING_WATER; // behöver ändras till bättre hantering... vid error läses inte nästa Prio3 task.
+
+            // -- DEBUG --
+            Serial.print("Temp: ");
+            Serial.print(currentStatus.indoorTemp, 1); // 1 decimal
+            Serial.print(" C | Fukt: ");
+            Serial.print(currentStatus.indoorHumidity, 1);
+            Serial.println(" %");
+            // -- DEBUG --
+
             return;
-        }
-
-        // if (DHT11_isReady()){    // har 18ms gått sen request?
-            // getDHT11Temp();
-            // getDHT11Humidity();
-            // ...else return;
+        
         break;
-    case 1:
+    case READING_WATER:
         //läs water leak
+        currentSensor = READING_DHT;
         break;
     }
-
-    currentSensor++;
-    if (currentSensor >= 2){
-        currentSensor = 0;
-    }
-
 };

@@ -1,3 +1,8 @@
+#ifndef SENSORS_H
+#define SENSORS_H
+
+void readPrio3SensorsAsync();
+
 struct SensorData {
     // Alarm (prio 1)
     bool reedSensor1;
@@ -15,3 +20,6 @@ struct SensorData {
 };
 
 extern SensorData currentStatus;
+
+
+#endif
