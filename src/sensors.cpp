@@ -27,20 +27,20 @@ void readPrio3SensorsAsync(){
     switch (currentSensor)
     {
     case READING_DHT: 
-        if (getDHTData())  //retunerar 'True' när sensorn är redo och datan är lagrad.
-            currentSensor = READING_WATER; // behöver ändras till bättre hantering... vid error läses inte nästa Prio3 task.
+        getDHTData();
 
-            // -- DEBUG --
-            Serial.print("Temp: ");
-            Serial.print(currentStatus.indoorTemp, 1); // 1 decimal
-            Serial.print(" C | Fukt: ");
-            Serial.print(currentStatus.indoorHumidity, 1);
-            Serial.println(" %");
-            // -- DEBUG --
+        // -- DEBUG --
+        Serial.print("Temp: ");
+        Serial.print(currentStatus.indoorTemp, 1); // 1 decimal
+        Serial.print(" C | Fukt: ");
+        Serial.print(currentStatus.indoorHumidity, 1);
+        Serial.println(" %");
+        // -- DEBUG --
 
-            return;
-        
+        currentSensor = READING_WATER; 
         break;
+
+        
     case READING_WATER:
         //läs water leak
         currentSensor = READING_DHT;
