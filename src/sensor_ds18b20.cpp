@@ -3,7 +3,10 @@
 #include <DallasTemperature.h>
 #include "alarm.h"
 
-#define ALARMING_TEMP 60
+#define DS18B20_READ_FREQUENCY_MS 550 // behöver tid att uppdatera data
+
+unsigned long DS18B20_ReqiuestTime;
+bool DS18B20_waitingForAnsware = false;
 
 // Definiera pin - (DI:4)
 const int ONE_WIRE_BUS = 4;
@@ -22,18 +25,24 @@ void initDS18B20() {
 }
 
 void getDS18B20data(){
-    ds18b20.requestTemperatures();
+    if (!DS18B20_waitingForAnsware){    // om inte frågat om temp ännu, gör det..
+        ds18b20.requestTemperatures();
+        DS18B20_ReqiuestTime = millis();    // räkna tiden från när vi frågar
+        DS18B20_waitingForAnsware = true;
 
-    if (ds18b20.getTempCByIndex(0) == -127){
-        //printf("DS18B20: No data..");
-    } else {
-        // lagrar temperatur från sensor "0" på bussen
-        node.sensors.fireTemp = ds18b20.getTempCByIndex(0);
-        printf("%.1f",node.sensors.fireTemp);
+        } else {
+        if (node.sysTime - DS18B20_ReqiuestTime >= DS18B20_READ_FREQUENCY_MS){ // har tillräckligt lång tid gått?
 
-        if (node.sensors.fireTemp >= ALARMING_TEMP){
-            node.alarmStatus.fireAlarm = true;
+            if (ds18b20.getTempCByIndex(0) == -127){
+                printf("DS18B20: No data..");
+            } else {
+                // lagrar temperatur från sensor "0" på bussen
+                node.sensors.fireTemp = ds18b20.getTempCByIndex(0);
+                printf("DS18B20: ");
+                printf("%.1f",node.sensors.fireTemp);
+            }
+        
+            DS18B20_waitingForAnsware = false; // nu väntar vi inte längre.. sätt till false
         }
     }
-
 }

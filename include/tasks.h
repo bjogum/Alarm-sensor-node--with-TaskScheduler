@@ -14,6 +14,7 @@ enum SensorStateP2 {
 
 void sensorsInit();
 void readPrio3Sensors();
+void readPrio2Sensors();
 
 
 

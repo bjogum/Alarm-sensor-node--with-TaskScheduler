@@ -9,9 +9,8 @@
 
 void sensorsInit(){
     initDHT();
-    // initDS18B20();
+    initDS18B20();
 }
-
 
 
 void readPrio2Sensors(){
@@ -31,6 +30,7 @@ void readPrio2Sensors(){
         break;
     }
 };
+
 
 void readPrio3Sensors(){
     static int currentSensor = READING_DHT; // static -> sätts endast EN gång (init)

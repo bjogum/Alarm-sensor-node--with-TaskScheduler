@@ -31,11 +31,11 @@ Tasks taskList[] = {
 
 void taskScheduler(){
   const int numOfTasks = sizeof(taskList) / sizeof(taskList[0]);
-  unsigned long sysTime = millis();
+  //unsigned long sysTime = millis(); // flytta till "node" - strukten!! <<----------------
 
   // Loopa igenom listan med TASKS (taskList) & checka tiden.
   for (int i; i<numOfTasks; i++){
-    if (sysTime - taskList[i].lastRun >= taskList[i].intervall){
+    if (node.sysTime - taskList[i].lastRun >= taskList[i].intervall){
 
       // kör den task det är dax att köra
       switch (taskList[i].prioType)
@@ -47,13 +47,15 @@ void taskScheduler(){
         break;
 
       case sensorPrio2:
-        // saftey (fire)
+        printf("\n<-----PRIO2_READ----->\n");
+        readPrio2Sensors();  
         // triggar någon sensor -> sätts extern var. till True
         break;
 
       case sensorPrio3:
-        readPrio3Sensors();
         printf("\n<-----PRIO3_READ----->\n");
+        readPrio3Sensors();
+        
         break;
       
       case serviceCheckAlarm:
@@ -74,7 +76,7 @@ void taskScheduler(){
         break;    
 
       }
-      taskList[i].lastRun = sysTime;
+      taskList[i].lastRun = node.sysTime;
     }
   };
 };

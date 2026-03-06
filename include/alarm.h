@@ -58,6 +58,7 @@ typedef struct
     AlarmMode alarmMode;       // Disarmed | Armed home | Armed away
     AlarmReason alarmStatus;   // intrusionAlarm | fireAlarm | waterLeak | systemFailure
     SensorData sensors;         // all sensordata
+    unsigned long sysTime;      // System-tiden
 }System;
 
 // deklarera variabel för systemet

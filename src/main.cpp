@@ -14,7 +14,9 @@ void setup() {
 }
 
 void loop() { 
+  node.sysTime = millis();
   startingSystem();
+
   
   if (node.runStatus == RUNNING){
     taskScheduler(); 
