@@ -49,6 +49,7 @@ typedef struct
 typedef struct
 {
     RunStatus runStatus;       // WAKING_UP (ca 60 s) | RUNNING
+    // WIFI & BLE status?
     AlarmMode alarmMode;       // Disarmed | Armed home | Armed away
     AlarmReason alarmStatus;   // intrusionAlarm | fireAlarm | waterLeak | systemFailure
     SensorData sensors;         // all sensordata
