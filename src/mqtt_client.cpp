@@ -12,8 +12,11 @@ MqttClient mqttClient(wifiClient);
 
 const char broker[] = MQTT_BROKER;
 int port = MQTT_PORT;
-const char indoorTempTopic[] = "sensor/indoorTemp";
-const char indoorHumidTopic[] = "sensor/indoorHumidity";
+const char indoorTempTopic[]     = "sensor/indoorTemp";
+const char indoorHumidTopic[]    = "sensor/indoorHumidity";
+const char waterleakTopic[]      = "sensor/waterleak";
+const char fireTopic[]           = "sensor/fire";
+const char systemFailure[]       = "systemFailure";
 
 //bool tryMQTTconnect = false;
 unsigned long MQTTConnectTimer = 0;
@@ -30,7 +33,6 @@ bool manageMQTT() {
         MQTTConnectTimer = node.sysTime;
 
         if (mqttClient.connect(broker, port)) {
-            //tryMQTTconnect = false;
             node.connectionStatus.mqttIsActive = true;
             initSendMQTT();
             return true;
@@ -45,50 +47,49 @@ bool manageMQTT() {
 }
 
 void initSendMQTT(){
-    // a) skicka all intressant data vid "init" - sensorer, heartbeat, RSSI, ..
-    /*
-    // ----TEST ----> topic + meddelandet, temp.
-    mqttClient.beginMessage(indoorTempTopic);
-    mqttClient.print(node.sensors.indoorTemp);
-    if (mqttClient.endMessage()) {
-        Serial.println("Temp: Sent OK!");
-    }
-    // ----TEST ----> topic + meddelandet, humid.
-    mqttClient.beginMessage(indoorHumidTopic);
-    mqttClient.print(node.sensors.indoorHumidity);
-    if (mqttClient.endMessage()) {
-        Serial.println("Humidity: Sent OK!");
-    }
-
-    // .poll() : håller igång anslutningen (ping) - och skickar/tar emot MQTT
-    mqttClient.poll();
-    */
+        // one-time, init messages
     }
 
 // -- avgör om datan behöver publiseras - Beroende på sensorer/status samt state --
 void sendMQTT(){
     // .poll() : håller igång anslutningen (ping) - och skickar/tar emot MQTT
     mqttClient.poll();
-    
+
     if (node.sysTime - MQTTLastSendTimer >= 2000){
         MQTTLastSendTimer = node.sysTime;
-            // ----TEST ----> topic + meddelandet, temp.
         mqttClient.beginMessage(indoorTempTopic);
         mqttClient.print(node.sensors.indoorTemp);
         if (mqttClient.endMessage()) {
             Serial.println("Temp: Sent OK!");
         }
-        // ----TEST ----> topic + meddelandet, humid.
+
         mqttClient.beginMessage(indoorHumidTopic);
         mqttClient.print(node.sensors.indoorHumidity);
         if (mqttClient.endMessage()) {
             Serial.println("Humidity: Sent OK!");
         }
+
+        if (node.alarmStatus.fireAlarm){
+            mqttClient.beginMessage(fireTopic);
+            mqttClient.print(node.sensors.fireTemp);
+            mqttClient.print(node.sensors.smokeSensor);
+            if (mqttClient.endMessage()) {
+                Serial.println("Fire: Sent OK!");
+        }
     }
-    // b) skicka förändrad data (enl. u1 & u2)
-        // b01) -> temp/fukt (DHT11) vid skillnader && max en gång varje sek..?                      [alla state]
-        // b02) -> övrigta sensorer -> vid förändring / triggning -- skicka direkt (prio 1 & 2)      [alla larmade state, utan PIR om "home"]
-    
+
+        if (node.alarmStatus.waterLeak){
+            mqttClient.beginMessage(waterleakTopic);
+            mqttClient.print(node.sensors.waterLeak);
+            if (mqttClient.endMessage()) {
+                Serial.println("Water: Sent OK!");
+            }
+        }
+
+        if (node.alarmStatus.systemFailure){
+            // skicka releveant larm
+        }
+    }
         // c) skicka heartbeat var 30e sek (bra trots LWT)
 }
 

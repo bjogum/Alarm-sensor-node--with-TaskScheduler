@@ -6,7 +6,7 @@
 #include "wifi_manager.h"
 #include "indicateStatus.h"
 #include "mqtt_client.h"
-#define WAKE_UP_SYSTEM_MS 20000 // maybe 60s ? (MQ2 & MQTT behöver tid..)
+#define WAKE_UP_SYSTEM_MS 20000 // maybe 60s ? (MQ2 behöver tid..)
 
 
 // enum för resp. PRIO-klass.
@@ -49,13 +49,11 @@ void taskScheduler(){
         break;
 
       case sensorPrio2:
-        Serial.println("\n<-----PRIO2_READ----->\n");
         readPrio2Sensors();  
         // triggar någon sensor -> sätts extern var. till True
         break;
 
       case sensorPrio3:
-        Serial.println("\n<-----PRIO3_READ----->\n");
         readPrio3Sensors();
         
         break;
