@@ -6,14 +6,16 @@
 #define MQTT_SEND_TIME 2000 // skicka MQTT varannan sek
 #define MQTT_RECONNECT_TIME 30000 // reconnect, 30s
 #define MQTT_CONNECTION_TIMEOUT 1000
-#define MQTT_HEARTBEAT 15000
+#define MQTT_HEARTBEAT 15000 // bör sänkas sen..
+#define MQTT_PORT 1883  // std: 1883 - krypt: 8883
+#define MQTT_IP "192.168.1.100"
 
 WiFiClient wifiClient;
 MqttClient mqttClient(wifiClient);
 
 int willQos                      = 1;
-int port                         = 8883;
-const char broker[]              = "192.168.1.100";
+int port                         = MQTT_PORT;
+const char broker[]              = MQTT_IP;
 const char indoorTempTopic[]     = "sensor/indoorTemp";
 const char indoorHumidTopic[]    = "sensor/indoorHumidity";
 const char waterleakTopic[]      = "sensor/waterleak";
